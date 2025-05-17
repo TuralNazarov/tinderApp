@@ -1,0 +1,57 @@
+<!-- messages.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messages</title>
+</head>
+<body>
+<h2>Send Message</h2>
+<input id="senderId" placeholder="Sender ID">
+<input id="receiverId" placeholder="Receiver ID">
+<input id="content" placeholder="Message">
+<button onclick="sendMessage()">Send</button>
+
+<h3>View Messages</h3>
+<input id="fromId" placeholder="From User ID">
+<input id="toId" placeholder="To User ID">
+<button onclick="loadMessages()">Load Messages</button>
+<div id="messageList"></div>
+
+<script>
+    const baseUrl = 'http://localhost:8080/api/v1Messagecontroller';
+
+    function sendMessage() {
+        const data = {
+            fromUserId: Number(document.getElementById('senderId').value),
+            toUserId: Number(document.getElementById('receiverId').value),
+            content: document.getElementById('content').value
+        };
+
+        fetch(baseUrl + '/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.ok ? alert('Message sent') : alert('Send failed'))
+            .catch(err => alert('Error occurred'));
+    }
+
+    function loadMessages() {
+        const from = document.getElementById('fromId').value;
+        const to = document.getElementById('toId').value;
+
+        fetch(`${baseUrl}/between/${from}/${to}`)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('messageList');
+                list.innerHTML = '';
+                data.forEach(m => {
+                    const item = document.createElement('div');
+                    item.textContent = `[${m.timestamp}] ${m.sender.id} ➝ ${m.receiver.id}: ${m.content}`;
+                    list.appendChild(item);
+                });
+            });
+    }
+</script>
+</body>
+</html>

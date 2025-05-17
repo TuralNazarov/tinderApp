@@ -1,0 +1,54 @@
+<!-- likes.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Likes</title>
+</head>
+<body>
+<h2>Add Like</h2>
+<input id="fromId" placeholder="Your User ID">
+<input id="toId" placeholder="Liked User ID">
+<button onclick="addLike()">Like</button>
+
+<h3>View Likes</h3>
+<input id="viewUserId" placeholder="User ID to view likes">
+<button onclick="loadLikes()">Load Likes</button>
+<div id="likeList"></div>
+
+<script>
+    const baseUrl = 'http://localhost:8080/api/v1/like';
+
+    function addLike() {
+        const data = {
+            fromUser: { id: Number(document.getElementById('fromId').value) },
+            toUser: { id: Number(document.getElementById('toId').value) },
+            liked: true
+        };
+
+        fetch(baseUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.ok ? alert('Like added') : alert('Failed to add like'))
+            .catch(() => alert('Error'));
+    }
+
+    function loadLikes() {
+        const userId = document.getElementById('viewUserId').value;
+
+        fetch(`${baseUrl}/${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('likeList');
+                list.innerHTML = '';
+                data.forEach(like => {
+                    const item = document.createElement('div');
+                    item.textContent = `${like.fromUser.id} ➝ ${like.toUser.id} | Liked: ${like.liked}`;
+                    list.appendChild(item);
+                });
+            });
+    }
+</script>
+</body>
+</html>

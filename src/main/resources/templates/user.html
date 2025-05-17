@@ -1,0 +1,52 @@
+<!-- users.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users</title>
+</head>
+<body>
+<h2>Add User</h2>
+<input id="username" placeholder="Username">
+<input id="email" placeholder="Email">
+<input id="password" placeholder="Password">
+<button onclick="addUser()">Add User</button>
+
+<h3>User List</h3>
+<button onclick="loadUsers()">Load Users</button>
+<div id="userList"></div>
+
+<script>
+    const baseUrl = 'http://localhost:8080/api/v1/users';
+
+    function addUser() {
+        const data = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
+
+        fetch(baseUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.ok ? alert('User added') : alert('Error adding user'))
+            .catch(err => alert('Request failed'));
+    }
+
+    function loadUsers() {
+        fetch(baseUrl + '/getAllUser')
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('userList');
+                list.innerHTML = '';
+                data.forEach(u => {
+                    const item = document.createElement('div');
+                    item.textContent = `${u.id} - ${u.username} (${u.email})`;
+                    list.appendChild(item);
+                });
+            });
+    }
+</script>
+</body>
+</html>
